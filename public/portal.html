@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Espace Client — AFRILEX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0a; --panel:#141210; --panel2:#1a1712; --border:rgba(201,168,76,.14);
+    --gold:#C9A84C; --gold-soft:rgba(201,168,76,.12); --text:#EDEAE3; --muted:#8a8578;
+    --green:#5aab7e; --amber:#d9a544; --red:#c0524a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;
+    background-image:radial-gradient(ellipse 900px 500px at 50% -10%, rgba(201,168,76,.06), transparent 60%);}
+  h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:600;margin:0;}
+  .eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);font-weight:500;}
+  a{color:var(--gold);}
+
+  /* ===== LOGIN ===== */
+  #login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .lbox{width:380px;max-width:100%;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:40px 34px;}
+  .lmark{width:52px;height:52px;margin:0 auto 14px;display:block;border-radius:8px;}
+  .lbox h1{text-align:center;font-size:26px;letter-spacing:2px;color:var(--gold);}
+  .lsub{text-align:center;font-size:12px;color:var(--muted);margin:6px 0 28px;letter-spacing:.5px;}
+  label{display:block;font-size:11px;color:var(--muted);letter-spacing:.5px;margin:16px 0 6px;}
+  input{width:100%;background:#0e0c0a;border:1px solid #2a2620;border-radius:8px;padding:11px 13px;color:var(--text);
+    font-family:'DM Sans',sans-serif;font-size:14px;}
+  input:focus{outline:none;border-color:var(--gold);}
+  .btn{width:100%;background:var(--gold);color:#100d08;border:none;border-radius:8px;padding:13px;font-size:14px;
+    font-weight:600;letter-spacing:.3px;cursor:pointer;margin-top:22px;font-family:'DM Sans',sans-serif;}
+  .btn:hover{background:#dab95c;}
+  .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text);}
+  .err{background:rgba(192,82,74,.12);color:#e08981;font-size:12.5px;padding:11px 13px;border-radius:8px;margin-top:16px;display:none;}
+  .foot-note{text-align:center;font-size:11px;color:var(--muted);margin-top:26px;}
+
+  /* ===== DASHBOARD ===== */
+  #dash{display:none;max-width:760px;margin:0 auto;padding:28px 20px 80px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding-bottom:22px;border-bottom:1px solid var(--border);margin-bottom:32px;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand img{width:30px;height:30px;border-radius:6px;}
+  .brand span{font-family:'Cormorant Garamond',serif;font-size:19px;letter-spacing:1.5px;color:var(--gold);}
+  .logout{font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;}
+  .logout:hover{color:var(--text);}
+
+  .hero{margin-bottom:38px;}
+  .hero h2{font-size:32px;color:var(--text);}
+  .hero p{color:var(--muted);font-size:14px;margin-top:8px;line-height:1.6;}
+
+  .statuspill{display:inline-flex;align-items:center;gap:7px;background:var(--gold-soft);border:1px solid var(--border);
+    border-radius:30px;padding:6px 16px;font-size:12px;color:var(--gold);margin-top:14px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--green);}
+
+  section{margin-bottom:36px;}
+  section > .eyebrow{margin-bottom:14px;display:block;}
+
+  .mcard{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:12px;}
+  .mcard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;}
+  .mcard h3{font-size:19px;color:var(--text);}
+  .mcard .meta{font-size:12.5px;color:var(--muted);margin-top:4px;}
+  .badge{font-size:10.5px;letter-spacing:.5px;text-transform:uppercase;padding:4px 11px;border-radius:20px;white-space:nowrap;}
+  .b-cours{background:rgba(90,171,126,.14);color:var(--green);}
+  .b-signe{background:var(--gold-soft);color:var(--gold);}
+  .b-suspendu{background:rgba(217,165,68,.14);color:var(--amber);}
+  .b-resilie{background:rgba(192,82,74,.14);color:#e08981;}
+  .b-termine{background:rgba(90,171,126,.14);color:var(--green);}
+
+  .empty{color:var(--muted);font-size:13.5px;padding:24px;text-align:center;background:var(--panel);border:1px dashed var(--border);border-radius:12px;}
+
+  .acard{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:22px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:520px){.row2{grid-template-columns:1fr;}}
+
+  .msg{margin-top:14px;padding:11px 13px;border-radius:8px;font-size:12.5px;}
+  .msg.ok{background:rgba(90,171,126,.14);color:var(--green);}
+  .msg.err{background:rgba(192,82,74,.12);color:#e08981;}
+
+  .contact{text-align:center;font-size:12.5px;color:var(--muted);padding-top:20px;border-top:1px solid var(--border);}
+  .contact a{color:var(--gold);text-decoration:none;}
+</style>
+</head>
+<body>
+
+<!-- ===== ÉCRAN DE CONNEXION ===== -->
+<div id="login">
+  <div class="lbox">
+    <img class="lmark" src="/logo-mark.jpg" onerror="this.style.display='none'" alt="">
+    <h1>AFRILEX</h1>
+    <div class="lsub">Espace Client — Votre projet, exécuté à votre place</div>
+    <label>Adresse e-mail</label>
+    <input id="email" type="email" placeholder="vous@exemple.com">
+    <label>Mot de passe</label>
+    <input id="pwd" type="password" placeholder="••••••••">
+    <button class="btn" onclick="doLogin()">Accéder à mon dossier</button>
+    <div class="err" id="loginErr"></div>
+    <div class="foot-note">Identifiants transmis par votre conseiller AFRILEX. Besoin d'aide ? <a href="mailto:afrilex@outlook.fr">afrilex@outlook.fr</a></div>
+  </div>
+</div>
+
+<!-- ===== TABLEAU DE BORD ===== -->
+<div id="dash">
+  <div class="topbar">
+    <div class="brand"><img src="/logo-mark.jpg" onerror="this.style.display='none'"><span>AFRILEX</span></div>
+    <button class="logout" onclick="doLogout()">Se déconnecter</button>
+  </div>
+
+  <div class="hero">
+    <span class="eyebrow">Espace personnel</span>
+    <h2 id="welcome">Bonjour,</h2>
+    <p>Suivez ici l'avancement de votre projet et l'état de vos mandats avec AFRILEX.</p>
+    <div class="statuspill"><span class="dot" id="statusDot"></span><span id="statusLabel">Portail actif</span></div>
+  </div>
+
+  <section>
+    <span class="eyebrow">Vos mandats</span>
+    <div id="mandatsList"><div class="empty">Chargement de votre dossier…</div></div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Vos documents</span>
+    <div class="acard">
+      <input type="file" id="docFile" style="margin-bottom:10px;font-size:12px;color:var(--muted)">
+      <button class="btn ghost" onclick="uploadDoc()">📎 Déposer un document</button>
+      <div id="uploadMsg"></div>
+      <div id="docsList" style="margin-top:16px"></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Votre compte</span>
+    <div class="acard">
+      <div class="row2">
+        <div>
+          <label>Mot de passe actuel</label>
+          <input id="curPwd" type="password">
+        </div>
+        <div>
+          <label>Nouveau mot de passe</label>
+          <input id="newPwd" type="password" placeholder="8 caractères minimum">
+        </div>
+      </div>
+      <button class="btn ghost" onclick="changePwd()">Mettre à jour le mot de passe</button>
+      <div id="pwdMsg"></div>
+    </div>
+  </section>
+
+  <div class="contact">
+    Une question sur votre dossier ? Écrivez à <a href="mailto:afrilex@outlook.fr">afrilex@outlook.fr</a> ou appelez le <a href="tel:+33745515616">+33 7 45 51 56 16</a>.
+  </div>
+</div>
+
+<script>
+let token = null;
+
+const STATUT_LABEL = {en_cours:'En cours', signe:'Signé', suspendu:'Suspendu', resilie:'Résilié', termine:'Terminé'};
+const STATUT_CLASS = {en_cours:'b-cours', signe:'b-signe', suspendu:'b-suspendu', resilie:'b-resilie', termine:'b-termine'};
+const TYPE_LABEL = {terrain:'Acquisition de terrain', construction:'Construction', gestion:'Gestion de projet', juridique:'Accompagnement juridique', locatif:'Gestion locative', autre:'Mission personnalisée'};
+
+function fmtDate(d){ return d ? new Date(d).toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'}) : '—'; }
+
+async function doLogin(){
+  const email = document.getElementById('email').value.trim();
+  const pwd = document.getElementById('pwd').value;
+  const err = document.getElementById('loginErr');
+  err.style.display = 'none';
+  if(!email || !pwd){ err.textContent = 'Merci de renseigner votre e-mail et votre mot de passe.'; err.style.display='block'; return; }
+  try{
+    const res = await fetch('/portal/login', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email, password: pwd})
+    });
+    const data = await res.json();
+    if(!res.ok){
+      err.textContent = data.error || 'Connexion impossible.';
+      err.style.display = 'block';
+      return;
+    }
+    token = data.accessToken;
+    document.getElementById('welcome').textContent = 'Bonjour ' + data.client.prenom + ',';
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('dash').style.display = 'block';
+    loadDossier();
+    loadDocuments();
+  }catch(e){
+    err.textContent = 'Impossible de contacter le serveur. Réessayez dans un instant.';
+    err.style.display = 'block';
+  }
+}
+
+function doLogout(){
+  token = null;
+  document.getElementById('dash').style.display = 'none';
+  document.getElementById('login').style.display = 'flex';
+  document.getElementById('pwd').value = '';
+}
+
+async function loadDossier(){
+  const list = document.getElementById('mandatsList');
+  try{
+    const res = await fetch('/portal/dossier', { headers:{'Authorization':'Bearer ' + token} });
+    const data = await res.json();
+    if(!res.ok){ list.innerHTML = '<div class="empty">Impossible de charger votre dossier pour le moment.</div>'; return; }
+    if(!data.mandats.length){
+      list.innerHTML = '<div class="empty">Aucun mandat actif pour le moment. Votre conseiller AFRILEX vous contactera dès qu\'un mandat sera établi.</div>';
+      return;
+    }
+    list.innerHTML = data.mandats.map(m => `
+      <div class="mcard">
+        <div class="mcard-top">
+          <div>
+            <h3>${TYPE_LABEL[m.type] || m.type || 'Mission'}</h3>
+            <div class="meta">${m.ref} ${m.pays ? '· ' + m.pays : ''}${m.ville ? ', ' + m.ville : ''} · Débuté le ${fmtDate(m.date_debut)}</div>
+          </div>
+          <span class="badge ${STATUT_CLASS[m.statut] || ''}">${STATUT_LABEL[m.statut] || m.statut}</span>
+        </div>
+      </div>
+    `).join('');
+  }catch(e){
+    list.innerHTML = '<div class="empty">Impossible de charger votre dossier pour le moment.</div>';
+  }
+}
+
+async function loadDocuments(){
+  const list = document.getElementById('docsList');
+  try{
+    const res = await fetch('/portal/documents', { headers:{'Authorization':'Bearer ' + token} });
+    const data = await res.json();
+    if(!res.ok || !data.length){ list.innerHTML = '<div class="empty" style="padding:16px">Aucun document déposé pour le moment.</div>'; return; }
+    list.innerHTML = data.map(d => `
+      <div class="mcard" style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center">
+        <div><strong style="font-size:14px">${d.nom_fichier}</strong><div class="meta">${d.categorie} · ${new Date(d.cree_le).toLocaleDateString('fr-FR')}</div></div>
+        <button class="btn ghost" style="width:auto;margin:0;padding:6px 12px;font-size:12px" onclick="downloadDoc('${d.id}','${d.nom_fichier}')">Télécharger</button>
+      </div>`).join('');
+  }catch(e){ list.innerHTML = '<div class="empty">Erreur de chargement.</div>'; }
+}
+
+async function downloadDoc(id, filename){
+  try{
+    const res = await fetch('/portal/documents/' + id + '/download', { headers:{'Authorization':'Bearer ' + token} });
+    if(!res.ok){ alert('Téléchargement impossible.'); return; }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+  }catch(e){ alert('Erreur réseau.'); }
+}
+
+async function uploadDoc(){
+  const fileInput = document.getElementById('docFile');
+  const msg = document.getElementById('uploadMsg');
+  if(!fileInput.files.length){ msg.className='msg err'; msg.textContent = 'Choisissez un fichier d\'abord.'; return; }
+  const fd = new FormData();
+  fd.append('file', fileInput.files[0]);
+  fd.append('categorie', 'Déposé par le client');
+  msg.className = 'msg'; msg.textContent = 'Envoi en cours...';
+  try{
+    const res = await fetch('/portal/documents', { method:'POST', headers:{'Authorization':'Bearer ' + token}, body: fd });
+    const data = await res.json();
+    if(!res.ok){ msg.className='msg err'; msg.textContent = data.error || 'Erreur'; return; }
+    msg.className = 'msg ok'; msg.textContent = 'Document déposé avec succès.';
+    fileInput.value = '';
+    loadDocuments();
+  }catch(e){ msg.className='msg err'; msg.textContent = 'Erreur réseau.'; }
+}
+
+async function changePwd(){
+  const currentPassword = document.getElementById('curPwd').value;
+  const newPassword = document.getElementById('newPwd').value;
+  const msg = document.getElementById('pwdMsg');
+  if(!newPassword || newPassword.length < 8){
+    msg.className = 'msg err'; msg.textContent = 'Le nouveau mot de passe doit faire au moins 8 caractères.'; return;
+  }
+  try{
+    const res = await fetch('/portal/change-password', {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer ' + token},
+      body: JSON.stringify({currentPassword, newPassword})
+    });
+    const data = await res.json();
+    if(!res.ok){ msg.className='msg err'; msg.textContent = data.error || 'Erreur.'; return; }
+    msg.className = 'msg ok';
+    msg.textContent = 'Mot de passe mis à jour. Utilisez-le dès votre prochaine connexion.';
+    document.getElementById('curPwd').value = '';
+    document.getElementById('newPwd').value = '';
+  }catch(e){
+    msg.className = 'msg err'; msg.textContent = 'Erreur réseau.';
+  }
+}
+
+document.getElementById('pwd').addEventListener('keydown', e => { if(e.key === 'Enter') doLogin(); });
+</script>
+</body>
+</html>

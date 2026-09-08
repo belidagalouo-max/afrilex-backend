@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>AFRILEX — Console admin</title>
+<style>
+  body{font-family:Arial,sans-serif;background:#0a0a0a;color:#eee;max-width:640px;margin:40px auto;padding:0 20px;}
+  h1{color:#C9A84C;font-size:20px;}
+  .card{background:#161616;border:1px solid #333;border-radius:10px;padding:20px;margin-bottom:20px;}
+  label{display:block;font-size:12px;color:#999;margin:10px 0 4px;}
+  input,select{width:100%;padding:8px;border-radius:6px;border:1px solid #444;background:#0a0a0a;color:#eee;box-sizing:border-box;}
+  button{background:#C9A84C;color:#000;border:none;padding:10px 16px;border-radius:6px;font-weight:bold;cursor:pointer;margin-top:12px;}
+  button:hover{opacity:0.9;}
+  .msg{margin-top:10px;padding:10px;border-radius:6px;font-size:13px;white-space:pre-wrap;word-break:break-all;}
+  .msg.ok{background:rgba(46,204,113,.15);color:#2ecc71;}
+  .msg.err{background:rgba(231,76,60,.15);color:#e74c3c;}
+  .hidden{display:none;}
+  table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px;}
+  td,th{border-bottom:1px solid #333;padding:6px;text-align:left;}
+</style>
+</head>
+<body>
+  <h1>🔧 AFRILEX — Console admin</h1>
+  <p style="color:#999;font-size:13px">Hébergée directement sur le backend — aucune adresse à saisir.</p>
+
+  <div class="card" id="loginCard">
+    <h3>1. Connexion</h3>
+    <label>Email</label>
+    <input id="email" value="admin@afrilex.fr">
+    <label>Mot de passe</label>
+    <input id="pwd" type="password" placeholder="admin123 (mot de passe de démarrage)">
+    <button onclick="doLogin()">Se connecter</button>
+    <div id="loginMsg"></div>
+  </div>
+
+  <div class="card hidden" id="pwdCard">
+    <h3>2. Changer le mot de passe</h3>
+    <p style="font-size:11px;color:#f39c12">⚠️ Fais ceci tout de suite après ta première connexion.</p>
+    <label>Nouveau mot de passe (8 caractères minimum)</label>
+    <input id="newPwd" type="password">
+    <button onclick="changePwd()">Changer le mot de passe</button>
+    <div id="pwdMsg"></div>
+  </div>
+
+  <div class="card hidden" id="dataCard">
+    <h3>3. Saisines reçues du site</h3>
+    <button onclick="loadSaisines()">🔄 Rafraîchir</button>
+    <div id="saisinesMsg"></div>
+    <table id="saisinesTable"></table>
+  </div>
+
+<script>
+let accessToken = null;
+const api = ''; // même origine que cette page — pas besoin d'adresse
+
+async function doLogin(){
+  const email = document.getElementById('email').value;
+  const pwd = document.getElementById('pwd').value;
+  const msg = document.getElementById('loginMsg');
+  msg.className = 'msg'; msg.textContent = 'Connexion en cours...';
+  try{
+    const res = await fetch(api + '/auth/login', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email, password: pwd})
+    });
+    const data = await res.json();
+    if(!res.ok){ msg.className='msg err'; msg.textContent = '❌ ' + (data.error || 'Erreur de connexion'); return; }
+    accessToken = data.accessToken;
+    msg.className = 'msg ok';
+    msg.textContent = '✅ Connecté en tant que ' + data.user.email + ' (' + data.user.role + ')';
+    document.getElementById('pwdCard').classList.remove('hidden');
+    document.getElementById('dataCard').classList.remove('hidden');
+  }catch(e){
+    msg.className = 'msg err';
+    msg.textContent = '❌ Erreur réseau : ' + e.message;
+  }
+}
+
+async function changePwd(){
+  const currentPassword = document.getElementById('pwd').value;
+  const newPassword = document.getElementById('newPwd').value;
+  const msg = document.getElementById('pwdMsg');
+  if(!newPassword || newPassword.length < 8){ msg.className='msg err'; msg.textContent='❌ 8 caractères minimum'; return; }
+  msg.className = 'msg'; msg.textContent = 'Changement en cours...';
+  try{
+    const res = await fetch(api + '/auth/change-password', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer ' + accessToken},
+      body: JSON.stringify({currentPassword, newPassword})
+    });
+    const data = await res.json();
+    if(!res.ok){ msg.className='msg err'; msg.textContent = '❌ ' + (data.error||'Erreur'); return; }
+    msg.className = 'msg ok';
+    msg.textContent = '✅ Mot de passe changé. Utilise-le dès ta prochaine connexion.';
+  }catch(e){ msg.className='msg err'; msg.textContent = '❌ ' + e.message; }
+}
+
+async function loadSaisines(){
+  const msg = document.getElementById('saisinesMsg');
+  const table = document.getElementById('saisinesTable');
+  msg.textContent = 'Chargement...';
+  try{
+    const res = await fetch(api + '/saisines', { headers:{'Authorization':'Bearer ' + accessToken} });
+    const data = await res.json();
+    if(!res.ok){ msg.className='msg err'; msg.textContent = '❌ ' + (data.error||'Erreur'); return; }
+    msg.className = 'msg ok';
+    msg.textContent = data.length + ' saisine(s) trouvée(s)';
+    table.innerHTML = '<tr><th>Réf</th><th>Type</th><th>Nom</th><th>Email</th><th>Source</th><th>Date</th></tr>' +
+      data.map(s => `<tr><td>${s.ref}</td><td>${s.type}</td><td>${s.nom||''}</td><td>${s.email||''}</td><td>${s.source||''}</td><td>${new Date(s.cree_le).toLocaleString('fr-FR')}</td></tr>`).join('');
+  }catch(e){ msg.className='msg err'; msg.textContent = '❌ ' + e.message; }
+}
+</script>
+</body>
+</html>
